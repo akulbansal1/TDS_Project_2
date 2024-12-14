@@ -22,13 +22,20 @@ try:
     from tabulate import tabulate
     from PIL import Image
     import chardet
+    
+    import os
+    import sys
+    import requests
+    import json
+    import traceback
 except ImportError: # if the libraries are not installed, install them
     import subprocess
     import sys
     subprocess.check_call([sys.executable, "-m", "pip", "install", 
                            "pandas", "matplotlib", "seaborn", 
                            "requests", "numpy", "statsmodels", 
-                           "base64", "tabulate", "chardet"])
+                           "base64", "tabulate", "chardet", "os",
+                           "sys","requests","json","traceback"])
     import pandas as pd
     import matplotlib.pyplot as plt
     from matplotlib.axes import Axes
@@ -41,6 +48,12 @@ except ImportError: # if the libraries are not installed, install them
     import sklearn
     from tabulate import tabulate
     import chardet
+
+    import os
+    import sys
+    import requests
+    import json
+    import traceback
 
 # Remove or comment out the following line for security
 os.environ['AIPROXY_TOKEN'] = 'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZjEwMDE5MDFAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9.mJt6NLK8wd3Y_uXAtkfAPm-Lztr51MxnaFGX9v0I1H0'
