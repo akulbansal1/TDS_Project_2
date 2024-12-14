@@ -12,7 +12,8 @@
 #   "tabulate",
 #   "Pillow",
 #   "chardet",
-#   "requests"
+#   "requests",
+#   "ipykernel"
 # ]
 # ///
 
@@ -265,8 +266,7 @@ def suggest_analyses(
         `json.loads(response["choices"][0]["message"]["content"])`, it should give me a python list of all the analyses, 
         where each analysis is further a dictionary. Use triple quotes for multiline string, and not backward quotes, like 
         you usually would when giving code.
-        Don't write `json` after the triple quotes otherwise. don't add '\n' in the output string or in the code otherwise 
-        the code will face issues while running.
+        Don't write `json` after the triple quotes otherwise. don't add the newline character in codes.
         In the analysis, avoid using columns that have a lot of missing values.
         '''
         '''
@@ -305,6 +305,15 @@ def suggest_analyses(
             elif "'''" in suggestions:
                 suggestions = suggestions.strip("'''")
             analyses = json.loads(suggestions)
+
+            if len(analyses) == 1:
+                key = list(analyses.keys())[0]
+                analyses = analyses[key]    
+
+            for anal in analyses:
+                if '\n' in anal['code']:
+                    raise Exception
+
             return analyses
 
         except json.JSONDecodeError:
@@ -629,9 +638,6 @@ def main():
 
     # Ask the LLM for suggestions on analyses
     analyses = suggest_analyses(api_key, metadata)
-    if len(analyses) == 1:
-        key = list(analyses.keys())[0]
-        analyses = analyses[key]
     print('Analyses suggestions from LLM collected!')
 
     # Perform analyses and generate the relevant charts
