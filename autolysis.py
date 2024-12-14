@@ -15,7 +15,7 @@
 #   "chardet",
 #   "json",
 #   "base64",
-#   "sklearn",
+#   "scikit-learn",
 #   "os",
 #   "sys",
 #   "traceback",
