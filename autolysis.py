@@ -18,77 +18,32 @@
 # ///
 
 # Import the necessary libraries
-try:
-    import pandas as pd
-    import matplotlib.pyplot as plt
-    from matplotlib.axes import Axes
-    import seaborn as sns
-    import requests
-    import numpy as np
-    import time
-    import statsmodels.api as sm
-    import base64
-    import sklearn
-    from tabulate import tabulate
-    from PIL import Image
-    import chardet
-    
-    import os
-    import sys
-    import json
-    import traceback
-except ImportError: # if the libraries are not installed, install them
-    import subprocess
-    import sys
-    subprocess.check_call([sys.executable, "-m", "pip", "install", 
-                           "pandas", "matplotlib", "seaborn", 
-                           "requests", "numpy", "statsmodels", 
-                           "base64", "tabulate", "chardet", "os",
-                           "sys","json","traceback"])
-    import pandas as pd
-    import matplotlib.pyplot as plt
-    from matplotlib.axes import Axes
-    import seaborn as sns
-    import requests
-    import numpy as np
-    import time
-    import statsmodels.api as sm
-    import base64
-    import sklearn
-    from tabulate import tabulate
-    import chardet
-
-    import os
-    import sys
-    import json
-    import traceback
-
-# Remove or comment out the following line for security
-os.environ['AIPROXY_TOKEN'] = 'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZjEwMDE5MDFAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9.mJt6NLK8wd3Y_uXAtkfAPm-Lztr51MxnaFGX9v0I1H0'
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
+import seaborn as sns
+import requests
+import numpy as np
+import time
+import statsmodels.api as sm
+import base64
+import sklearn
+from tabulate import tabulate
+from PIL import Image
+import chardet
+import os
+import sys
+import json
+import traceback
 
 
 # ------------------------------------------------------------------------------
 # Utils
 # ------------------------------------------------------------------------------
 
-def get_data_metadata(
-        df: pd.DataFrame
-) -> dict:
-    """
-    Get general information of the dataset.
-    
-    Parameters
-    ----------
-    df: pandas DataFrame containing the data.
+# get general information of entire dataset
+def get_data_metadata(df: pd.DataFrame) -> dict:
 
-    Returns
-    -------
-    dictionary with 
-        list of columns (and their datatypes)
-        summary statistics such as mean, median, 0.25/0.75 percentile, etc.
-        missing values count for each column, and
-        first 10 random instances of the data. 
-    """
     metadata = {
         "columns": [],
         "dtypes": {},
@@ -116,27 +71,9 @@ def get_data_metadata(
     return metadata
 
 
-def make_openai_request(
-        api_key: str,
-        messages: list,
-        model: str ="gpt-4o-mini"
-) -> dict:
-    """
-    Send POST request to the proxy LLM
-    
-    Parameters
-    ----------
-    api_key: string with with AIPROXY TOKEN
-    messages: list of dictionaries, with each dictionary with
-      keys 'role' and 'content'
-    model: string to show which model to use for the response; 
-      gtp-4o-mini by default
-    
-    Returns
-    -------
-    dict: parsed JSON response from the POST request
-    """
-    
+# Send POST request to the proxy LLM
+def make_openai_request(api_key: str, messages: list, model: str ="gpt-4o-mini") -> dict:
+
     url = "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions"
 
     # Set up the headers
@@ -179,75 +116,31 @@ def detect_encoding(file_path):
     #     result = chardet.detect(f.read())
     # encoding = result['encoding']
 
+# Encodes an image file to a Base64 string.
 def encode_image_to_base64(image_path):
-    """
-    Encodes an image file to a Base64 string.
 
-    Parameters:
-    - image_path (str): Path to the image file.
-
-    Returns:
-    - str: Base64-encoded string of the image.
-    """
     with open(image_path, 'rb') as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
     return encoded_string
 
 
+# Resize and compress an image.
 def resize_and_compress_image(image_path, output_path, size=(512, 512), quality=70):
-    """
-    Resize and compress an image.
-
-    Parameters:
-    - image_path (str): Path to the original image.
-    - output_path (str): Path to save the resized and compressed image.
-    - size (tuple): Desired size in pixels (width, height).
-    - quality (int): Compression quality (1-100). Lower means more compression.
-    """
-    try:
-        with Image.open(image_path) as img:
-            # Resize the image using the new Resampling filter
-            img = img.resize(size, Image.Resampling.LANCZOS)
-            
-            # Compress and save the image
-            img.save(output_path, format='PNG', optimize=True, quality=quality)
-        print(f"Image resized and compressed: {output_path}")
-    except Exception as e:
-        print(f"Error processing image {image_path}: {e}")
+    with Image.open(image_path) as img:
+        # Resize the image using the new Resampling filter
+        img = img.resize(size, Image.Resampling.LANCZOS)
+        
+        # Compress and save the image
+        img.save(output_path, format='PNG', optimize=True, quality=quality)
+    print(f"Image resized and compressed: {output_path}")
 
 # ------------------------------------------------------------------------------
 # Analysis
 # ------------------------------------------------------------------------------
 
-def suggest_analyses(
-        api_key: str,
-        metadata: dict
-) -> list:
-    """
-    Using the metadata of the dataset, ask the LLM for what kind of analyses can be run
-    on the entire dataset for insights.
-
-    Parameters
-    ----------
-    api_key: string with with AIPROXY TOKEN
-    metadata: dictionary containing summaries info of the entire dataset
-
-    Returns
-    -------
-    list of dictionaries in the format:
-        [
-            {
-                'title': '...', (title of analysis)
-                'description': '...', (brief description of analysis)
-                'return_type': '...', (type of return from the code; 'image', 'DataFrame', or 'text')
-                'code': '...' (python code for the analysis)
-            },
-            {
-                ...
-            },
-            ...
-        ]
-    """
+# Using the metadata of the dataset, ask the LLM for what kind of analyses can be run
+# on the entire dataset for insights.
+def suggest_analyses(api_key: str, metadata: dict) -> list:
 
     prompt = (
         f'''
@@ -270,18 +163,18 @@ def suggest_analyses(
         In the analysis, avoid using columns that have a lot of missing values.
         '''
         '''
-        format of your output should be a list of analyses where each component is a dictionary.
-        In the dictionary, there should be four keys 'title', 'description', 'return_type', and 'code'. If the code is 
-        supposed to return an image, mention 'image' in 'return_type'; The return type of each code should either be 
-        a DataFrame, text, or an image. 
+        Format your output as a list of analyses where each component is a dictionary.
+        Each dictionary should have four keys: 'title', 'description', 'return_type', and 'code'. If the code is 
+        supposed to return an image, mention 'image' in 'return_type'; the return type of each code should be 
+        either a DataFrame, text, or an image. 
         In the code, use only these libraries: pandas (alias pd), numpy (alias np), seaborn (alias sns), matplotlib.pyplot (alias plt), and statsmodels (alias sm).
-        no need to import the libraries in any of your codes. Assume all these libraries have already been imported.
+        No need to import the libraries in any of your codes. Assume all these libraries have already been imported.
         Any code that is creating a chart, save the figure under the variable name `resulting_figure` so I can access
         it in my code and save the figure. Keep images small. No more than 500x500px. That's the size of 1 tile. 
         Any code that is creating a dataframe or a statsmodels summary, save the output under the variable name `resulting_data` so I can access
         it in my code and save the data. 
         Don't use multiline strings anywhere in the output. Use double-quoted string for code.
-        Suggest basic analysis on the dataset. Make sure the outputs of the codes are either images are the analysis is such that the output should be 
+        Suggest basic analysis on the dataset. Make sure the outputs of the codes are either images or the analysis is such that the output should be 
         manageable within 10-15 rows. Don't do analyses that will output the entire dataset.
         '''
     )
@@ -329,33 +222,8 @@ def suggest_analyses(
             sys.exit(1)
 
 
-def perform_analysis(
-        df: pd.DataFrame, 
-        analyses: list, 
-        folder_name: str
-) -> list:
-    """
-    Run the code(s) in analyses.
-
-    Parameters
-    ----------
-    df: pandas DataFrame containing the entire dataset.
-    analyses: list of dictionaries, where each dictionary is an analysis.
-    folder_name: string of the name of folder where charts are to be saved.
-
-    Returns
-    -------
-    updated list of analyses, where a new key is added to each dictionary:
-    'result': stores the output of the code; or
-    'image_b64': stores the Base64-encoded string of the chart.
-        [
-            {
-                ...,
-                'result': '...' (JSON string or text)
-                'image_b64': '...' (Base64 string, if applicable)
-            }
-        ]
-    """
+# Run the code(s) in analyses.
+def perform_analysis(df: pd.DataFrame, analyses: list, folder_name: str) -> list:
 
     max_iter = 5
     for attempts in range(max_iter):
@@ -454,24 +322,8 @@ def perform_analysis(
 # Summary
 # ------------------------------------------------------------------------------
 
-def summarize_analysis(
-        api_key: str,
-        metadata: dict,
-        analyses: list
-) -> str:
-    """
-    Ask the LLM to summarize the analysis using the outputs.
-
-    Parameters
-    ----------
-    api_key: string with with AIPROXY TOKEN
-    metadata: dictionary containing summaries info of the entire dataset
-    analyses: list of dictionaries containing analyses
-
-    Returns
-    -------
-    String of summary report in Markdown format
-    """
+# Ask the LLM to summarize the analysis using the outputs.
+def summarize_analysis(api_key: str, metadata: dict, analyses: list) -> str:
 
     try:
         prompt = (
@@ -481,7 +333,7 @@ def summarize_analysis(
             "- The implications of the findings.\n\n"
             f"Dataset Metadata:\n{json.dumps(metadata, indent=2)}\n\n"
             "Analyses Performed:\n"
-            "To add charts in the analysis, if threre is a chart, use the path of the image"
+            "To add charts in the analysis, if there is a chart, use the path of the image"
         )
         
         for analysis in analyses:
@@ -514,7 +366,7 @@ def summarize_analysis(
             elif return_type == 'text':
                 prompt += f"**Summary Output:**\n\n{result}\n\n"
 
-            
+        
 
         prompt += "Please format the output in Markdown, ensuring that images are properly embedded and tables are neatly formatted."
 
@@ -535,11 +387,7 @@ def summarize_analysis(
         print(f"Error communicating with API for summarization: {e}")
         sys.exit(1)
 
-def analyse_outputs(
-        api_key: str,
-        metadata: dict,
-        analyses: list
-) -> str:
+def analyse_outputs(api_key: str, metadata: dict, analyses: list) -> str:
     
     final_summary = ""
     num = 0
@@ -559,11 +407,7 @@ def analyse_outputs(
     return final_summary
 
 
-def create_report(
-        api_key: str,
-        summary: str,
-        metadata: dict
-) -> str:
+def create_report(api_key: str, summary: str, metadata: dict) -> str:
     
     prompt = f'''
         Based on the following dataset metadata and analyses performed, write a comprehensive story that includes:\n
@@ -588,9 +432,9 @@ def create_report(
 
     return report
 
-
-def save_readme(summary, folder_name):
-    """Save the summary to README.md."""
+# Save the summary to README.md.
+def save_readme(summary: str, folder_name: str):
+    
     try:
         with open(f"{folder_name}/README.md", "w") as f:
             f.write(summary)
@@ -598,7 +442,6 @@ def save_readme(summary, folder_name):
     except Exception as e:
         print(f"Error writing README.md: {e}")
         sys.exit(1)
-
 
 # ------------------------------------------------------------------------------
 # Main Application
@@ -610,19 +453,18 @@ def main():
         print("Usage: uv run autolysis.py dataset.csv")
         sys.exit(1)
 
-    # Get csv file address
+    # Get CSV file path
     csv_file = sys.argv[1]
 
     # Load API key
     try:
         api_key = os.environ["AIPROXY_TOKEN"]
         print('API key loaded!')
-
     except KeyError:
         print("Error: The AIPROXY_TOKEN environment variable is not set.")
         sys.exit(1)
 
-    # Read CSV
+    # Read CSV with detected encoding
     try:
         encoding = detect_encoding(csv_file)
         df = pd.read_csv(csv_file, encoding=encoding)
@@ -632,29 +474,28 @@ def main():
         print(f"Error reading the CSV file: {e}")
         sys.exit(1)
 
-    # Get metadata
+    # Extract metadata
     metadata = get_data_metadata(df)
     print('Metadata collected!')
 
-    # Ask the LLM for suggestions on analyses
+    # Suggest analyses using the LLM
     analyses = suggest_analyses(api_key, metadata)
     print('Analyses suggestions from LLM collected!')
 
-    # Perform analyses and generate the relevant charts
+    # Perform analyses and generate outputs
     performed_analyses = perform_analysis(df, analyses, folder_name=folder)
     print("Analysis' codes run and results saved!")
 
-    # Summarize analysis into a story
+    # Summarize analyses into a brief story
     text_analysis = analyse_outputs(api_key, metadata, performed_analyses)
     print("Brief reports generated for each analysis!")
 
-    # Write and save README.md
-    save_readme(text_analysis, folder_name=folder)
+    # Create a comprehensive report
+    comprehensive_report = create_report(api_key, text_analysis, metadata)
+    print("Comprehensive report created.")
+
+    # Save the report to README.md
+    save_readme(comprehensive_report, folder_name=folder)
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
