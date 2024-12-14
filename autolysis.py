@@ -1,4 +1,28 @@
-#!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.9"
+# dependencies = [
+#   "pandas",
+#   "seaborn",
+#   "matplotlib",
+#   "numpy",
+#   "scipy",
+#   "openai",
+#   "scikit-learn",
+#   "time",
+#   "statsmodels",
+#   "tabulate",
+#   "PIL",
+#   "chardet",
+#   "json",
+#   "base64",
+#   "sklearn",
+#   "os",
+#   "sys",
+#   "traceback"
+#   "requests",
+#   "ipykernel",  # Added ipykernel
+# ]
+# ///
 
 # Import the necessary libraries
 try:
@@ -18,7 +42,6 @@ try:
     
     import os
     import sys
-    import requests
     import json
     import traceback
 except ImportError: # if the libraries are not installed, install them
@@ -28,7 +51,7 @@ except ImportError: # if the libraries are not installed, install them
                            "pandas", "matplotlib", "seaborn", 
                            "requests", "numpy", "statsmodels", 
                            "base64", "tabulate", "chardet", "os",
-                           "sys","requests","json","traceback"])
+                           "sys","json","traceback"])
     import pandas as pd
     import matplotlib.pyplot as plt
     from matplotlib.axes import Axes
@@ -44,7 +67,6 @@ except ImportError: # if the libraries are not installed, install them
 
     import os
     import sys
-    import requests
     import json
     import traceback
 
