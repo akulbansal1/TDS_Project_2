@@ -8,19 +8,11 @@
 #   "scipy",
 #   "openai",
 #   "scikit-learn",
-#   "time",
 #   "statsmodels",
 #   "tabulate",
-#   "PIL",
+#   "Pillow",
 #   "chardet",
-#   "json",
-#   "base64",
-#   "scikit-learn",
-#   "os",
-#   "sys",
-#   "traceback",
-#   "requests",
-#   "ipykernel",  # Added ipykernel
+#   "requests"
 # ]
 # ///
 
