@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
 
-import os
-import sys
-import requests
-import json
-import traceback
-from io import StringIO
-
 # Import the necessary libraries
 try:
     import pandas as pd
