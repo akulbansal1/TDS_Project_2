@@ -421,113 +421,6 @@ def perform_analysis(
                 traceback.print_exc()
                 time.sleep(5)
 
-
-# def perform_analysis(
-#         df: pd.DataFrame, 
-#         analyses: list, 
-#         folder_name: str
-# ) -> list:
-#     """
-#     Run the code(s) in analyses.
-
-#     Parameters
-#     ----------
-#     df: pandas DataFrame containing the entire dataset.
-#     analyses: list of dictionaries, where each dictionary is an analysis.
-#     folder_name: string of the name of folder where charts are to be saved.
-
-#     Returns
-#     -------
-#     updated list of analyses, where a new key is added to each dictionary:
-#     'result': stores the output of the code; or
-#     'image_b64': stores the Base64-encoded string of the chart.
-#         [
-#             {
-#                 ...,
-#                 'result': '...' (JSON string or text)
-#                 'image_b64': '...' (Base64 string, if applicable)
-#             }
-#         ]
-#     """
-
-#     max_iter = 5
-#     for attempts in range(max_iter):
-#         try:
-#             for i, analysis in enumerate(analyses):
-#                 print(i)
-                
-#                 # get the return type of code
-#                 return_type = analysis['return_type']
-                
-#                 # extract the code
-#                 code = analysis['code']
-                
-#                 # define the libraries and other variables
-#                 globals_dict = {'pd': pd, 'np': np, 'plt': plt, 'sns': sns, 'sm': sm}
-#                 locals_dict = {'df': df, 'data': df}
-                
-#                 # execute the code
-#                 try:
-#                     exec(code, globals_dict, locals_dict)
-                
-#                     if return_type == 'image':
-                        
-#                         # Images/Charts
-#                         figure = locals_dict.get('resulting_figure')
-#                         if figure is not None:
-#                             # Create folder if it doesn't exist
-#                             os.makedirs(folder_name, exist_ok=True)
-#                             # Save chart to the appropriate directory for later usage
-#                             path = os.path.join(folder_name, f'chart_{i}.png')
-#                             figure.savefig(path, dpi=100)  # Adjust DPI as needed
-#                             plt.close(figure)
-#                             # Encode image to base64
-#                             resize_and_compress_image(path, path)
-#                             chart_b64 = encode_image_to_base64(path)
-#                             # Store the Base64 string in the dictionary
-#                             analysis['image_b64'] = chart_b64
-#                             # Optionally, remove the file path if not needed
-#                             analysis.pop('result', None)
-#                         else:
-#                             print(f"Warning: 'resulting_figure' not found in analysis {i}.")
-                    
-#                     elif return_type == 'DataFrame':
-#                         # DataFrames
-#                         data = locals_dict.get('resulting_data')
-#                         if isinstance(data, pd.DataFrame):
-#                             # Convert DataFrame to JSON string
-#                             json_data = data.to_json(orient='records')
-#                             analysis['result'] = json_data
-#                         else:
-#                             print(f"Warning: 'resulting_data' is not a DataFrame in analysis {i}.")
-                    
-#                     elif return_type == 'text':
-#                         # Text summaries (e.g., statsmodels summaries)
-#                         data = locals_dict.get('resulting_data')
-#                         if isinstance(data, str):
-#                             analysis['result'] = data
-#                         elif hasattr(data, 'as_text'):
-#                             # If it's a statsmodels summary
-#                             summary_text = data.as_text()
-#                             analysis['result'] = summary_text
-#                         else:
-#                             print(f"Warning: 'resulting_data' is not a string or statsmodels summary in analysis {i}.")
-#                 except:
-#                     continue
-                
-#             return analyses
-
-#         except Exception as e:
-#             if attempts == max_iter - 1:
-#                 print(f"Error during analysis: {e}")
-#                 traceback.print_exc()
-#                 sys.exit(1)
-#             else:
-#                 print('Error occurred. Retrying after 5 seconds...')
-#                 traceback.print_exc()
-#                 time.sleep(5)
-
-
 # ------------------------------------------------------------------------------
 # Summary
 # ------------------------------------------------------------------------------
@@ -654,6 +547,7 @@ def create_report(
             Please format the output in Markdown, embedding the images appropriately.\n\n
         Using the collection of all analyses and their summaries, write a comprehensive report of the entire study.
         Please format the output in Markdown, ensuring that images are properly embedded and tables are neatly formatted.
+        embed the appropriate tables and headings in Markdown format. Add charts, if needed.
     '''
 
     messages = [
