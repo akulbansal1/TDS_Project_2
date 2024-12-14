@@ -24,7 +24,6 @@ import requests
 import json
 import openai  # Make sure you install this library: pip install openai
 
-os.environ['AIPROXY_TOKEN'] = 'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZjEwMDE5MDFAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9.mJt6NLK8wd3Y_uXAtkfAPm-Lztr51MxnaFGX9v0I1H0'
 
 # Function to analyze the data (basic summary stats, missing values, correlation matrix)
 def analyze_data(df):
